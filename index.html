@@ -125,6 +125,57 @@
             margin-top: 3rem;
         }
 
+        /* Final Audio Prompt Section - placed at the very top of the full container */
+        .audio-prompt-section {
+            margin-bottom: 3.5rem;
+            padding-bottom: 2.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+            opacity: 0;
+            animation: fadeInFull 1.2s ease forwards;
+            animation-delay: 0.5s;
+        }
+
+        .audio-message-text {
+            font-size: 1.1rem;
+            font-style: italic;
+            opacity: 0.85;
+            margin-bottom: 1.5rem;
+            max-width: 600px;
+            line-height: 1.8;
+            letter-spacing: 0.02em;
+        }
+
+        /* Redesigned rounded rectangular button: white background, black text */
+        .listen-button {
+            padding: 0.85rem 2.2rem;
+            border-radius: 9999px; /* Fully rounded pill shape */
+            background: #ffffff;
+            color: #0c0c0c;
+            font-family: 'Libre Baskerville', serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            text-decoration: none;
+            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15);
+            border: none;
+        }
+
+        .listen-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(255, 255, 255, 0.3);
+            background: #f0f0f0;
+        }
+
         /* Subtle click hint */
         .click-hint {
             position: fixed;
@@ -225,13 +276,22 @@
             clickHint.style.display = 'none';
             fullContainer.classList.add('visible');
 
+            // Prepend the audio prompt section at the very top of the full view
+            const audioSection = document.createElement('div');
+            audioSection.className = 'audio-prompt-section';
+            audioSection.innerHTML = `
+                <div class="audio-message-text">I have nothing to offer you for your effort except this piece composed especially for you.</div>
+                <a href="https://www.dropbox.com/scl/fi/aqfhfyerzdwxd3sm7xn2k/Transcendentia.mp3?rlkey=dp7brdni8jqsjephj6xf5l6l8&st=gm4b79ur&dl=0" target="_blank" class="listen-button">Listen</a>
+            `;
+            fullContainer.appendChild(audioSection);
+
             // Flatten all chunks into single array of lines for final display
             const allLines = chunks.flat();
             
             allLines.forEach((text, idx) => {
                 const p = document.createElement('div');
                 p.className = 'full-line';
-                p.style.animationDelay = `${idx * 0.15}s`;
+                p.style.animationDelay = `${(idx * 0.15) + 0.3}s`;
 
                 if (text === "") {
                     p.style.height = '1.5rem';
