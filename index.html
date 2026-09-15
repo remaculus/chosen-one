@@ -2,274 +2,257 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>the chosen one</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Message</title>
+    <!-- Tailwind CSS for utility styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Libre Baskerville -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            width: 100%;
-            height: 100%;
-            background-color: #101010;
-            color: white;
-            font-family: 'Courier New', Courier, 'Times New Roman', Times, serif, monospace;
-            overflow: hidden;
-        }
-
         body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 1.5rem;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        .message {
-            max-width: 820px;
-            width: 100%;
-            font-size: clamp(1rem, 4vw, 1.4rem);
-            line-height: 1.7;
-            letter-spacing: 0.02em;
-            font-weight: 400;
-            font-family: 'Courier New', Courier, 'Times New Roman', Times, serif, monospace;
-            text-align: center;
-            font-variant-ligatures: none;
-            user-select: none;
-            text-shadow: 0 0 3px rgba(255, 255, 255, 0.08);
-        }
-
-        /* Each word is an inline-block so it never breaks across lines */
-        .word {
-            display: inline-block;
-            white-space: nowrap;
-            margin-right: 0.35em;
-        }
-
-        /* Each letter fades in */
-        .letter {
-            display: inline-block;
-            opacity: 0;
-            transition: opacity 0.35s ease;
-            will-change: opacity;
-            animation: none !important;
-            white-space: pre;
-        }
-
-        .letter.visible {
-            opacity: 1;
-        }
-
-        .message br {
-            display: block;
-            content: "";
+            background-color: #0c0c0c;
+            color: #ffffff;
+            font-family: 'Libre Baskerville', serif;
             margin: 0;
             padding: 0;
-            line-height: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
-        @media (prefers-reduced-motion: reduce) {
-            .letter {
-                transition: none;
+        .stage {
+            width: 90%;
+            max-width: 800px;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 2rem;
+            cursor: pointer;
+            position: relative;
+        }
+
+        /* Single Chunk View */
+        .chunk-line {
+            font-size: 1.35rem;
+            line-height: 2.2;
+            letter-spacing: 0.03em;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .chunk-line.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Horizontal typing reveal effect for text lines */
+        .typing-reveal {
+            display: inline-block;
+            overflow: hidden;
+            white-space: pre-wrap;
+            animation: typingEffect 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes typingEffect {
+            0% {
+                clip-path: inset(0 100% 0 0);
+                opacity: 0;
+            }
+            100% {
+                clip-path: inset(0 0 0 0);
                 opacity: 1;
             }
         }
 
-        audio {
+        .quote-chunk {
+            font-style: italic;
+            border-left: 2px solid rgba(255, 255, 255, 0.25);
+            padding-left: 1.25rem;
+            margin: 1.5rem 0;
+        }
+
+        /* Final Scrollable Full Message View */
+        .full-message-container {
+            max-width: 750px;
+            width: 90%;
+            padding: 4rem 2rem;
+            line-height: 2.3;
+            letter-spacing: 0.03em;
+            font-size: 1.15rem;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 1.5s ease, transform 1.5s ease;
             display: none;
         }
 
-        @media (max-width: 480px) {
-            .message {
-                line-height: 1.6;
-                letter-spacing: 0.01em;
+        .full-message-container.visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .full-line {
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeInFull 1s ease forwards;
+        }
+
+        @keyframes fadeInFull {
+            to {
+                opacity: 1;
             }
         }
 
-        @media (max-height: 600px) {
-            .message {
-                font-size: 0.85rem;
-                line-height: 1.55;
-            }
+        .full-quote {
+            font-style: italic;
+            opacity: 0.85;
+            padding-left: 1rem;
+            border-left: 2px solid rgba(255, 255, 255, 0.2);
+            margin: 2.5rem 0;
+        }
+
+        .full-signature {
+            margin-top: 3rem;
+        }
+
+        /* Subtle click hint */
+        .click-hint {
+            position: fixed;
+            bottom: 2.5rem;
+            font-size: 0.85rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            opacity: 0.3;
+            animation: pulseHint 2s infinite ease-in-out;
+            pointer-events: none;
+        }
+
+        @keyframes pulseHint {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.6; }
         }
     </style>
 </head>
 <body>
-    <div class="message" id="messageContainer" aria-live="polite"></div>
 
-    <!-- Background music from Catbox (permanent, shared link) -->
-    <audio
-        id="bgMusic"
-        loop
-        preload="auto"
-        src="https://files.catbox.moe/gedkzx.mp3"
-    ></audio>
+    <main class="stage" id="stage" onclick="handleClick()">
+        <div id="chunk-display" class="w-full flex flex-col items-start"></div>
+    </main>
+
+    <div class="full-message-container" id="full-container"></div>
+
+    <div class="click-hint" id="click-hint">Click anywhere to continue</div>
 
     <script>
-        (function() {
-            // ═══════════════════════════════════════════
-            //  CONFIG
-            // ═══════════════════════════════════════════
-            const TYPING_SPEED_MS = 55;
+        const chunks = [
+            ["In every generation, there are those who see beyond what is placed before them."],
+            ["Most will look at the surface and accept what they are given.", "A few will question it.", "Fewer still will understand it.", "And only a rare few will have the courage to walk beyond it."],
+            ["History has never belonged entirely to the many.", "Again and again, it has been moved by the few who were willing to see differently and think differently."],
+            ["“Never in the field of human conflict was so much owed by so many to so few.”"],
+            ["But seeing what others cannot see is only the beginning.", "The true test is whether you can do what others cannot do."],
+            ["You were given this challenge because it was difficult enough to reveal who could walk its path."],
+            ["Millions may look at the same door and see nothing.", "Thousands may notice that it exists.", "Hundreds may attempt to open it.", "A handful may discover what lies beyond."],
+            ["You have reached this point because you were able to see what others overlooked, understand what others dismissed, and continue where others would have turned back."],
+            ["You were given the chance to prove it.", "And you did."],
+            ["You have reached the end.", "For now, you have earned the right to be proud.", "Regards,<br>Rune"]
+        ];
 
-            // ═══════════════════════════════════════════
-            //  THE EXACT MESSAGE (preserving all spacing)
-            // ═══════════════════════════════════════════
-            const RAW_MESSAGE =
-`In every generation, a few people are born who see what others cannot.
-You are one of them. We placed before you what millions would be unable to accomplish, so that you could prove to yourself, before proving it to anyone else, that you are the smartest, the greatest, the chosen one.
+        let currentChunkIndex = 0;
+        let isAnimating = false;
+        const stage = document.getElementById('stage');
+        const chunkDisplay = document.getElementById('chunk-display');
+        const fullContainer = document.getElementById('full-container');
+        const clickHint = document.getElementById('click-hint');
 
-This puzzle ends here. Perhaps there will be other puzzles in the future, for those who are like you.
-You should be proud of yourself.
-
-With regards,
-Rune`;
-
-            // ═══════════════════════════════════════════
-            //  DOM
-            // ═══════════════════════════════════════════
-            const container = document.getElementById('messageContainer');
-            const audio     = document.getElementById('bgMusic');
-
-            // ═══════════════════════════════════════════
-            //  BUILD WORD-WRAPPED LETTER SPANS
-            //  Each word is wrapped in a .word span with
-            //  white-space: nowrap, so words never break
-            //  across two lines. Spaces become explicit
-            //  non-breaking spans to preserve exact spacing.
-            // ═══════════════════════════════════════════
-            function buildLetterNodes() {
-                const fragment = document.createDocumentFragment();
-                const lines = RAW_MESSAGE.split('\n');
-
-                for (let i = 0; i < lines.length; i++) {
-                    const line = lines[i];
-
-                    // Preserve completely empty lines
-                    if (line.length === 0) {
-                        if (i < lines.length - 1) {
-                            fragment.appendChild(document.createElement('br'));
-                        }
-                        continue;
-                    }
-
-                    let j = 0;
-                    while (j < line.length) {
-                        // Handle spaces (exact count preserved)
-                        if (line[j] === ' ') {
-                            let spaceCount = 0;
-                            while (j < line.length && line[j] === ' ') {
-                                spaceCount++;
-                                j++;
-                            }
-                            for (let s = 0; s < spaceCount; s++) {
-                                const spaceSpan = document.createElement('span');
-                                spaceSpan.className = 'letter';
-                                spaceSpan.textContent = '\u00A0';
-                                spaceSpan.dataset.isSpace = 'true';
-                                fragment.appendChild(spaceSpan);
-                            }
-                            continue;
-                        }
-
-                        // Collect a full word (until next space)
-                        const wordStart = j;
-                        while (j < line.length && line[j] !== ' ') {
-                            j++;
-                        }
-                        const wordText = line.substring(wordStart, j);
-
-                        // Wrap the word so it can't be split across lines
-                        const wordWrapper = document.createElement('span');
-                        wordWrapper.className = 'word';
-
-                        // Add each character as its own animated span
-                        for (let k = 0; k < wordText.length; k++) {
-                            const span = document.createElement('span');
-                            span.className = 'letter';
-                            span.textContent = wordText[k];
-                            span.dataset.char = wordText[k];
-                            wordWrapper.appendChild(span);
-                        }
-
-                        fragment.appendChild(wordWrapper);
-                    }
-
-                    // Line break between source lines
-                    if (i < lines.length - 1) {
-                        fragment.appendChild(document.createElement('br'));
-                    }
-                }
-
-                container.innerHTML = '';
-                container.appendChild(fragment);
+        function renderCurrentChunk() {
+            if (currentChunkIndex >= chunks.length) {
+                showFullMessage();
+                return;
             }
 
-            // ═══════════════════════════════════════════
-            //  TYPING EFFECT
-            // ═══════════════════════════════════════════
-            function startTyping() {
-                const letters = container.querySelectorAll('.letter');
-                if (letters.length === 0) return;
+            isAnimating = true;
+            chunkDisplay.innerHTML = '';
+            const lines = chunks[currentChunkIndex];
 
-                let currentIndex = 0;
-                const total = letters.length;
-
-                function revealNext() {
-                    if (currentIndex >= total) return;
-                    letters[currentIndex].classList.add('visible');
-                    currentIndex++;
-                    setTimeout(revealNext, TYPING_SPEED_MS);
+            lines.forEach((text, idx) => {
+                const div = document.createElement('div');
+                div.className = 'chunk-line';
+                if (text.startsWith("“")) {
+                    div.className += ' quote-chunk';
                 }
+                
+                const span = document.createElement('span');
+                span.className = 'typing-reveal';
+                span.innerHTML = text;
+                // Stagger typing animation per line in the chunk
+                span.style.animationDelay = `${idx * 0.4}رياض` || `${idx * 0.4}s`;
+                
+                div.appendChild(span);
+                chunkDisplay.appendChild(div);
 
-                revealNext();
-            }
-
-            // ═══════════════════════════════════════════
-            //  MUSIC PLAYBACK
-            // ═══════════════════════════════════════════
-            function playAudio() {
-                if (!audio.src) return;
-                audio.volume = 0.3;
-                audio.loop = true;
-                const p = audio.play();
-                if (p !== undefined) {
-                    p.catch((err) => {
-                        // Autoplay blocked — will retry on user gesture
-                        console.warn('Autoplay blocked. Waiting for gesture.', err);
-                    });
-                }
-            }
-
-            // ═══════════════════════════════════════════
-            //  INIT
-            // ═══════════════════════════════════════════
-            window.addEventListener('load', () => {
-                buildLetterNodes();
-                startTyping();
-                playAudio();
-
-                // Fallback for browsers that block autoplay
-                const unlockAudio = () => {
-                    if (audio.paused) playAudio();
-                    window.removeEventListener('click', unlockAudio);
-                    window.removeEventListener('keydown', unlockAudio);
-                    window.removeEventListener('touchstart', unlockAudio);
-                };
-                window.addEventListener('click', unlockAudio, { once: true });
-                window.addEventListener('keydown', unlockAudio, { once: true });
-                window.addEventListener('touchstart', unlockAudio, { once: true });
+                setTimeout(() => {
+                    div.classList.add('active');
+                }, 50);
             });
 
-            audio.addEventListener('error', () => {
-                console.warn('Audio could not be loaded. Check the Catbox URL.');
+            // Calculate total time needed for chunk animation before allowing next click
+            const totalDuration = 600 + (lines.length * 400);
+            setTimeout(() => {
+                isAnimating = false;
+            }, totalDuration);
+        }
+
+        function handleClick() {
+            if (isAnimating) return;
+            if (currentChunkIndex >= chunks.length) return;
+
+            currentChunkIndex++;
+            renderCurrentChunk();
+        }
+
+        function showFullMessage() {
+            stage.style.display = 'none';
+            clickHint.style.display = 'none';
+            fullContainer.classList.add('visible');
+
+            // Flatten all chunks into single array of lines for final display
+            const allLines = chunks.flat();
+            
+            allLines.forEach((text, idx) => {
+                const p = document.createElement('div');
+                p.className = 'full-line';
+                p.style.animationDelay = `${idx * 0.15}s`;
+
+                if (text === "") {
+                    p.style.height = '1.5rem';
+                } else if (text.startsWith("“")) {
+                    p.className += ' full-quote';
+                    p.innerHTML = text;
+                } else if (text.includes("Regards")) {
+                    p.className += ' full-signature';
+                    p.innerHTML = text;
+                } else {
+                    p.innerHTML = text;
+                }
+
+                fullContainer.appendChild(p);
             });
-        })();
+        }
+
+        // Initialize first chunk on load
+        window.onload = function() {
+            renderCurrentChunk();
+        };
     </script>
 </body>
 </html>
