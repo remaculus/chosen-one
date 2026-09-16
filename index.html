@@ -1,318 +1,365 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Message</title>
-    <!-- Tailwind CSS for utility styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Libre Baskerville -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>the chosen one</title>
+
+    <!-- Cairo font — elegant Arabic -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+
     <style>
-        body {
-            background-color: #0c0c0c;
-            color: #ffffff;
-            font-family: 'Libre Baskerville', serif;
+        * {
             margin: 0;
             padding: 0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow-x: hidden;
-            user-select: none;
-            -webkit-user-select: none;
+            box-sizing: border-box;
         }
 
-        .stage {
-            width: 90%;
-            max-width: 800px;
-            min-height: 400px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 2rem;
-            cursor: pointer;
-            position: relative;
+        /* ═══════════════════════════════════════════
+           HIDE SCROLLBAR — but keep scrolling enabled
+           Works across Chrome, Safari, Edge, Firefox
+           ═══════════════════════════════════════════ */
+
+        /* Firefox */
+        html, body {
+            scrollbar-width: none;       /* hides scrollbar in Firefox */
+            -ms-overflow-style: none;    /* hides scrollbar in old Edge/IE */
         }
 
-        /* Single Chunk View */
-        .chunk-line {
-            font-size: 1.35rem;
-            line-height: 2.2;
-            letter-spacing: 0.03em;
-            margin-bottom: 1.5rem;
-            opacity: 0;
-            transform: translateY(8px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-
-        .chunk-line.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Horizontal typing reveal effect for text lines */
-        .typing-reveal {
-            display: inline-block;
-            overflow: hidden;
-            white-space: pre-wrap;
-            animation: typingEffect 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        @keyframes typingEffect {
-            0% {
-                clip-path: inset(0 100% 0 0);
-                opacity: 0;
-            }
-            100% {
-                clip-path: inset(0 0 0 0);
-                opacity: 1;
-            }
-        }
-
-        .quote-chunk {
-            font-style: italic;
-            border-left: 2px solid rgba(255, 255, 255, 0.25);
-            padding-left: 1.25rem;
-            margin: 1.5rem 0;
-        }
-
-        /* Final Scrollable Full Message View */
-        .full-message-container {
-            max-width: 750px;
-            width: 90%;
-            padding: 4rem 2rem;
-            line-height: 2.3;
-            letter-spacing: 0.03em;
-            font-size: 1.15rem;
-            opacity: 0;
-            transform: translateY(15px);
-            transition: opacity 1.5s ease, transform 1.5s ease;
+        /* WebKit / Blink (Chrome, Edge, Safari, Opera) */
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar {
+            width: 0;
+            height: 0;
             display: none;
         }
 
-        .full-message-container.visible {
+        html, body {
+            width: 100%;
+            min-height: 100%;
+            background-color: #101010;
+            color: #ffffff;
+            font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+            overflow-x: hidden;          /* no horizontal scroll ever */
+            overflow-y: auto;            /* vertical scroll allowed when needed */
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh;
+        }
+
+        .message {
+            max-width: 1200px;
+            width: 100%;
+            font-size: clamp(1.1rem, 2.6vw, 1.6rem);
+            line-height: 2;
+            font-weight: 400;
+            font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+            text-align: center;
+            user-select: none;
+            text-shadow: 0 0 3px rgba(255, 255, 255, 0.06);
+            color: #ffffff;
+            direction: rtl;
+            margin: auto;                /* keeps content centered when short */
+        }
+
+        /* Each PART is a continuous line on large screens */
+        .part {
             display: block;
-            opacity: 1;
-            transform: translateY(0);
+            white-space: nowrap;
+            margin: 1.4rem 0;
         }
 
-        .full-line {
-            margin-bottom: 2rem;
+        /* Word wrapper — fades in as a whole unit */
+        .word {
+            display: inline-block;
             opacity: 0;
-            animation: fadeInFull 1s ease forwards;
+            transition: opacity 0.4s ease;
+            will-change: opacity;
+            margin-left: 0.18em;
+            margin-right: 0.18em;
+            white-space: nowrap;
         }
 
-        @keyframes fadeInFull {
-            to {
+        .word.visible {
+            opacity: 1;
+        }
+
+        /* Listen button */
+        .listen-wrapper {
+            margin: 2rem 0;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        .listen-wrapper.show {
+            opacity: 1;
+        }
+
+        .listen-btn {
+            display: inline-block;
+            padding: 0.85rem 3rem;
+            background: #ffffff;
+            color: #101010;
+            font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-decoration: none;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.12);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .listen-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 28px rgba(255, 255, 255, 0.25);
+        }
+
+        .listen-btn:active {
+            transform: scale(0.98);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .word {
+                transition: none;
+                opacity: 1;
+            }
+            .listen-wrapper {
+                transition: none;
                 opacity: 1;
             }
         }
 
-        .full-quote {
-            font-style: italic;
-            opacity: 0.85;
-            padding-left: 1rem;
-            border-left: 2px solid rgba(255, 255, 255, 0.2);
-            margin: 2.5rem 0;
+        /* ═══════════════════════════════════════════
+           RESPONSIVE — Tablets and below
+           ═══════════════════════════════════════════ */
+        @media (max-width: 1100px) {
+            .message {
+                font-size: clamp(1.05rem, 2.4vw, 1.4rem);
+            }
+            .part {
+                white-space: normal;
+                margin: 1.2rem 0;
+            }
         }
 
-        .full-signature {
-            margin-top: 3rem;
+        /* ═══════════════════════════════════════════
+           RESPONSIVE — Mobile phones
+           ═══════════════════════════════════════════ */
+        @media (max-width: 700px) {
+            body {
+                padding: 2rem 1.1rem;
+            }
+            .message {
+                font-size: 1.1rem;
+                line-height: 1.9;
+            }
+            .part {
+                white-space: normal;
+                margin: 1rem 0;
+            }
+            .listen-btn {
+                padding: 0.75rem 2.4rem;
+                font-size: 1rem;
+            }
         }
 
-        /* Final Audio Prompt Section - placed at the very top of the full container */
-        .audio-prompt-section {
-            margin-bottom: 3.5rem;
-            padding-bottom: 2.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            text-align: left;
-            opacity: 0;
-            animation: fadeInFull 1.2s ease forwards;
-            animation-delay: 0.5s;
+        /* ═══════════════════════════════════════════
+           RESPONSIVE — Small phones
+           ═══════════════════════════════════════════ */
+        @media (max-width: 400px) {
+            body {
+                padding: 1.5rem 0.9rem;
+            }
+            .message {
+                font-size: 1rem;
+                line-height: 1.85;
+            }
+            .part {
+                margin: 0.85rem 0;
+            }
         }
 
-        .audio-message-text {
-            font-size: 1.1rem;
-            font-style: italic;
-            opacity: 0.85;
-            margin-bottom: 1.5rem;
-            max-width: 600px;
-            line-height: 1.8;
-            letter-spacing: 0.02em;
+        /* ═══════════════════════════════════════════
+           RESPONSIVE — Short landscape
+           ═══════════════════════════════════════════ */
+        @media (max-height: 600px) and (orientation: landscape) {
+            body {
+                padding: 1.5rem 1rem;
+            }
+            .message {
+                font-size: 0.95rem;
+                line-height: 1.7;
+            }
+            .part {
+                margin: 0.7rem 0;
+            }
+            .listen-wrapper {
+                margin: 1rem 0;
+            }
+            .listen-btn {
+                padding: 0.6rem 2rem;
+                font-size: 0.95rem;
+            }
         }
 
-        /* Redesigned rounded rectangular button: white background, black text */
-        .listen-button {
-            padding: 0.85rem 2.2rem;
-            border-radius: 9999px; /* Fully rounded pill shape */
-            background: #ffffff;
-            color: #0c0c0c;
-            font-family: 'Libre Baskerville', serif;
-            font-size: 0.95rem;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            cursor: pointer;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            text-decoration: none;
-            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15);
-            border: none;
-        }
-
-        .listen-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(255, 255, 255, 0.3);
-            background: #f0f0f0;
-        }
-
-        /* Subtle click hint */
-        .click-hint {
-            position: fixed;
-            bottom: 2.5rem;
-            font-size: 0.85rem;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            opacity: 0.3;
-            animation: pulseHint 2s infinite ease-in-out;
-            pointer-events: none;
-        }
-
-        @keyframes pulseHint {
-            0%, 100% { opacity: 0.2; }
-            50% { opacity: 0.6; }
+        /* ═══════════════════════════════════════════
+           RESPONSIVE — Very large screens
+           ═══════════════════════════════════════════ */
+        @media (min-width: 1600px) {
+            .message {
+                max-width: 1400px;
+                font-size: 1.7rem;
+                line-height: 2.1;
+            }
         }
     </style>
 </head>
 <body>
-
-    <main class="stage" id="stage" onclick="handleClick()">
-        <div id="chunk-display" class="w-full flex flex-col items-start"></div>
-    </main>
-
-    <div class="full-message-container" id="full-container"></div>
-
-    <div class="click-hint" id="click-hint">Click anywhere to continue</div>
+    <div class="message" id="messageContainer" aria-live="polite"></div>
 
     <script>
-        const chunks = [
-            ["In every generation, there are those who see beyond what is placed before them."],
-            ["Most will look at the surface and accept what they are given.", "A few will question it.", "Fewer still will understand it.", "And only a rare few will have the courage to walk beyond it."],
-            ["History has never belonged entirely to the many.", "Again and again, it has been moved by the few who were willing to see differently and think differently."],
-            ["“Never in the field of human conflict was so much owed by so many to so few.”"],
-            ["But seeing what others cannot see is only the beginning.", "The true test is whether you can do what others cannot do."],
-            ["You were given this challenge because it was difficult enough to reveal who could walk its path."],
-            ["Millions may look at the same door and see nothing.", "Thousands may notice that it exists.", "Hundreds may attempt to open it.", "A handful may discover what lies beyond."],
-            ["You have reached this point because you were able to see what others overlooked, understand what others dismissed, and continue where others would have turned back."],
-            ["You were given the chance to prove it.", "And you did."],
-            ["You have reached the end.", "For now, you have earned the right to be proud.", "Regards,<br>Rune"]
-        ];
+        (function() {
+            // ═══════════════════════════════════════════
+            //  CONFIG
+            // ═══════════════════════════════════════════
+            const WORD_SPEED_MS = 260;
+            const LISTEN_URL = "https://www.dropbox.com/scl/fi/aqfhfyerzdwxd3sm7xn2k/Transcendentia.mp3?rlkey=dp7brdni8jqsjephj6xf5l6l8&st=b6qtqj28&dl=0";
 
-        let currentChunkIndex = 0;
-        let isAnimating = false;
-        const stage = document.getElementById('stage');
-        const chunkDisplay = document.getElementById('chunk-display');
-        const fullContainer = document.getElementById('full-container');
-        const clickHint = document.getElementById('click-hint');
+            // ═══════════════════════════════════════════
+            //  THE MESSAGE
+            // ═══════════════════════════════════════════
+            const PARTS = [
+                "لقد وصلت إلى النهاية.",
+                "لقد حاول كثيرون، وربما نظروا إلى الموضع ذاته، لكن القلة وحدها واصلت البحث حتى وجدت الطريق.",
+                "وأنت واحدٌ من تلك القلة.",
+                "لقد اجتزت اللغز الأول، وأثبتَّ أن لديك من الذكاء والصبر والبصيرة ما مكّنك من الوصول إلى حيث عجز الآخرون.",
+                "ستكون هناك اختبارات أخرى؛ أكثر خفاءً، وأشد تعقيدًا.",
+                "أما الآن، فقد بلغت نهاية الطريق الأولى.",
+                "وليس لدي ما أهديه لك سوى مقطوعة موسيقية عُزفت خصيصًا لأجلك، احترامًا لما بذلته من جهد."
+            ];
 
-        function renderCurrentChunk() {
-            if (currentChunkIndex >= chunks.length) {
-                showFullMessage();
-                return;
+            const CLOSING_LINES = [
+                "مع خالص التحية،",
+                "Rune"
+            ];
+
+            // ═══════════════════════════════════════════
+            //  DOM
+            // ═══════════════════════════════════════════
+            const container = document.getElementById('messageContainer');
+
+            // ═══════════════════════════════════════════
+            //  BUILD A PART AS ONE CONTINUOUS LINE OF WORDS
+            // ═══════════════════════════════════════════
+            function buildPart(text) {
+                const partEl = document.createElement('div');
+                partEl.className = 'part';
+
+                const tokens = text.split(' ');
+
+                for (let t = 0; t < tokens.length; t++) {
+                    const wordText = tokens[t];
+
+                    if (t > 0) {
+                        partEl.appendChild(document.createTextNode(' '));
+                    }
+
+                    if (wordText.length === 0) continue;
+
+                    const wordWrapper = document.createElement('span');
+                    wordWrapper.className = 'word';
+                    wordWrapper.textContent = wordText;
+
+                    partEl.appendChild(wordWrapper);
+                }
+
+                return partEl;
             }
 
-            isAnimating = true;
-            chunkDisplay.innerHTML = '';
-            const lines = chunks[currentChunkIndex];
+            // ═══════════════════════════════════════════
+            //  BUILD FULL MESSAGE STRUCTURE
+            // ═══════════════════════════════════════════
+            function buildMessage() {
+                const fragment = document.createDocumentFragment();
 
-            lines.forEach((text, idx) => {
-                const div = document.createElement('div');
-                div.className = 'chunk-line';
-                if (text.startsWith("“")) {
-                    div.className += ' quote-chunk';
-                }
-                
-                const span = document.createElement('span');
-                span.className = 'typing-reveal';
-                span.innerHTML = text;
-                // Stagger typing animation per line in the chunk
-                span.style.animationDelay = `${idx * 0.4}رياض` || `${idx * 0.4}s`;
-                
-                div.appendChild(span);
-                chunkDisplay.appendChild(div);
+                PARTS.forEach((partText) => {
+                    fragment.appendChild(buildPart(partText));
+                });
 
-                setTimeout(() => {
-                    div.classList.add('active');
-                }, 50);
-            });
+                // Listen button
+                const btnWrapper = document.createElement('div');
+                btnWrapper.className = 'listen-wrapper';
+                btnWrapper.id = 'listenWrapper';
 
-            // Calculate total time needed for chunk animation before allowing next click
-            const totalDuration = 600 + (lines.length * 400);
-            setTimeout(() => {
-                isAnimating = false;
-            }, totalDuration);
-        }
+                const btn = document.createElement('a');
+                btn.className = 'listen-btn';
+                btn.href = LISTEN_URL;
+                btn.target = '_blank';
+                btn.rel = 'noopener noreferrer';
+                btn.textContent = 'Listen';
 
-        function handleClick() {
-            if (isAnimating) return;
-            if (currentChunkIndex >= chunks.length) return;
+                btnWrapper.appendChild(btn);
+                fragment.appendChild(btnWrapper);
 
-            currentChunkIndex++;
-            renderCurrentChunk();
-        }
+                CLOSING_LINES.forEach((lineText) => {
+                    fragment.appendChild(buildPart(lineText));
+                });
 
-        function showFullMessage() {
-            stage.style.display = 'none';
-            clickHint.style.display = 'none';
-            fullContainer.classList.add('visible');
+                container.innerHTML = '';
+                container.appendChild(fragment);
+            }
 
-            // Prepend the audio prompt section at the very top of the full view
-            const audioSection = document.createElement('div');
-            audioSection.className = 'audio-prompt-section';
-            audioSection.innerHTML = `
-                <div class="audio-message-text">I have nothing to offer you for your effort except this piece composed especially for you.</div>
-                <a href="https://www.dropbox.com/scl/fi/aqfhfyerzdwxd3sm7xn2k/Transcendentia.mp3?rlkey=dp7brdni8jqsjephj6xf5l6l8&st=gm4b79ur&dl=0" target="_blank" class="listen-button">Listen</a>
-            `;
-            fullContainer.appendChild(audioSection);
+            // ═══════════════════════════════════════════
+            //  WORD-BY-WORD FADE-IN
+            // ═══════════════════════════════════════════
+            function startTyping() {
+                const words = container.querySelectorAll('.word');
+                if (words.length === 0) return;
 
-            // Flatten all chunks into single array of lines for final display
-            const allLines = chunks.flat();
-            
-            allLines.forEach((text, idx) => {
-                const p = document.createElement('div');
-                p.className = 'full-line';
-                p.style.animationDelay = `${(idx * 0.15) + 0.3}s`;
+                let currentIndex = 0;
+                const total = words.length;
 
-                if (text === "") {
-                    p.style.height = '1.5rem';
-                } else if (text.startsWith("“")) {
-                    p.className += ' full-quote';
-                    p.innerHTML = text;
-                } else if (text.includes("Regards")) {
-                    p.className += ' full-signature';
-                    p.innerHTML = text;
-                } else {
-                    p.innerHTML = text;
+                function revealNext() {
+                    if (currentIndex >= total) {
+                        const wrapper = document.getElementById('listenWrapper');
+                        if (wrapper) wrapper.classList.add('show');
+                        return;
+                    }
+                    words[currentIndex].classList.add('visible');
+                    currentIndex++;
+                    setTimeout(revealNext, WORD_SPEED_MS);
                 }
 
-                fullContainer.appendChild(p);
-            });
-        }
+                revealNext();
+            }
 
-        // Initialize first chunk on load
-        window.onload = function() {
-            renderCurrentChunk();
-        };
+            // ═══════════════════════════════════════════
+            //  INIT
+            // ═══════════════════════════════════════════
+            function init() {
+                buildMessage();
+                startTyping();
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
     </script>
 </body>
 </html>
